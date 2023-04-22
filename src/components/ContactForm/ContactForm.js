@@ -48,7 +48,9 @@ export default class ContactForm extends Component {
     );
   
     if (contactInState) {
-      alert(`${contactInState.name} is already in contacts!`);
+      alert(`${contactInState.name} is already in contacts!
+      ${contactInState.name} is not saved in the phonebook!`);
+      return;
     } else {
       onAddContact(name, number);
   
