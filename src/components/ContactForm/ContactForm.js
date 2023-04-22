@@ -42,14 +42,22 @@ export default class ContactForm extends Component {
   handleSubmit = e => {
     e.preventDefault();
     const { name, number } = this.state;
-    const { onAddContact } = this.props;
+    const { contacts, onAddContact } = this.props;
+    const contactInState = contacts.find(
+      contact => contact.name.toLowerCase() === name.toLowerCase()
+    );
+  
+    if (contactInState) {
+      alert(`${contactInState.name} is already in contacts!`);
+    } else {
       onAddContact(name, number);
+  
       this.setState({
         name: '',
         number: '',
       });
-      return;
-    
+        alert(`${name} has been added to contacts!`);
+    }
   };
 
   render() {
