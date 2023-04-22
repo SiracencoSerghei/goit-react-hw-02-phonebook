@@ -1,88 +1,69 @@
 
-import {React,  Component } from "react";
-import { nanoid } from "nanoid";
+import { React, Component } from "react";
+import { nanoid } from 'nanoid'; // npm i nanoid
+import ContactForm from "./ContactForm";
+import Filter from "./Filter";
+import ContactList from "./ContactList";
+import './App.css';
 
-export class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      contacts: [],
-      name: '',
-      number: '',
-    };
-    this.nameInputId = nanoid();
-    this.numberInputId = nanoid();
-    this.onChangeName = this.onChangeName.bind(this);
-    this.onSubmit = this.onSubmit.bind(this);
+export default class App extends Component {
+
+  state = {
+    contacts: [
+      {id: 'id-1', name: 'Rosie Simpson', number: '459-12-56'},
+      {id: 'id-2', name: 'Hermione Kline', number: '443-89-12'},
+      {id: 'id-3', name: 'Eden Clements', number: '645-17-79'},
+      {id: 'id-4', name: 'Annie Copeland', number: '227-91-26'},
+    ],
+    filter: '',
   }
 
-  onChangeName = event => {
-    const { name, value } = event.currentTarget;
-    console.log(this.state);
-    this.setState(
-      // не работает для чекбоксов
-      { [name]: value }
-    );
-  };
+  addContact = (name, number) => {
+    const newContact = {
+      id: nanoid(),
+      name,
+      number,
+    };
+    this.setState(prevState => {
+      return {
+        contacts: [...prevState.contacts, newContact],
+      }
+    });
+  }
 
-  onSubmit = event => {
-    event.preventDefault();
-    console.log(this.state);
+  handleChangeFilter = filter => {
+    this.setState({filter});
+  }
 
+  getFilteredContacts = () => {
+    const {contacts, filter} = this.state;
+    return contacts.filter(contact => contact.name.toLowerCase().includes(filter.toLowerCase()))
+  }
+
+  handleRemove = contactId => {
+    this.setState(prevState => {
+      return {
+        contacts: prevState.contacts.filter(({id}) => id !== contactId)
+      }
+    })
   }
 
   render() {
-    return (
-      <div>
-        <div
-          style={{
-            height: '100vh',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            fontSize: 40,
-            color: '#010101'
-          }}
-        >
-          <form onSubmit={this.onSubmit}>
-            <label htmlFor={this.nameInputId} >
-              Name:
-              <input
-                type="text"
-                name="name"
-                id={this.nameInputId}
-                value={this.state.name}
-                onChange={this.onChangeName}
-                pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
-                title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
-                required
-              />
-            </label>
-            <label htmlFor={this.numberInputId}>
-              <input 
-               type="tel"
-               name="number"
-               id={this.numberInputId}
-                value={this.state.number}
-                onChange={this.onChangeName}
-                pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
-               title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
-               required
-               />
-            </label>
-
-            <button type="submit" value="submit" >Submit</button>
-          </form>
+    const {contacts, filter} = this.state;
+    return(
+      <>
+        <div className="Container">
+          <section title="Phonebook" className="Section">
+            <h1>Phonebook</h1>
+            <ContactForm contacts={contacts} onAddContact={this.addContact}/>
+          </section>
+          <section title="Contacts" className="Section">
+            <h2>Contacts</h2>
+            <Filter value={filter} onChangeFilter={this.handleChangeFilter}/>
+            <ContactList filteredContacts={this.getFilteredContacts()} onRemove={this.handleRemove} />
+          </section>
         </div>
-        <div>
-          <h2>Contacts</h2>
-          <ul>
-            <li>{this.state.name}: {this.state.number}</li>
-          </ul>
-        </div>
-      </div>
-    );
+      </>
+    )
   }
-
-
-};
+}
